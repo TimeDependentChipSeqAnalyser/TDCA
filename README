@@ -20,6 +20,6 @@ DIRECTORY CONTENTS
 DOWNLOAD/INSTALL
 ================
 $wget https://github.com/TimeDependentChipSeqAnalyser/TDCA/archive/master.zip
-$tar -xvzf master.zip
-$cd TDCA-1.1.0-master
+$unzip master.zip
+$cd TDCA-master
 $make

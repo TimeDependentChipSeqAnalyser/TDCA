@@ -6,8 +6,9 @@
 using namespace std;
 
 std::string drcR(int i_loopNumber, std::string s_peakExtention, bool b_L4flag);
+std::string drcRpoisson(int i_loopNumber, std::string s_peakExtention);
 
-void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFiles, int turnoverTimes[], std::vector<double> &turnoverArr, std::vector<bool> &b_typeArr, int i_minIndex, int i_maxIndex, double d_satthresh, std::vector<bool> &b_forwardArr, std::vector<bool> &b_reverseArr, std::vector<bool> &b_peak1Arr, std::vector<bool> &b_peak2Arr, std::vector<bool> &b_dip1Arr, std::vector<bool> &b_dip2Arr, bool b_model, bool b_L4flag, std::string s_name) 
+void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFiles, int turnoverTimes[], std::vector<double> &turnoverArr, std::vector<bool> &b_typeArr, int i_minIndex, int i_maxIndex, double d_satthresh, std::vector<bool> &b_forwardArr, std::vector<bool> &b_reverseArr, std::vector<bool> &b_peak1Arr, std::vector<bool> &b_peak2Arr, std::vector<bool> &b_dip1Arr, std::vector<bool> &b_dip2Arr, bool b_model, bool b_L4flag, std::string s_name, bool b_poissonFlagCall) 
 {
 
 	// write R script
@@ -63,7 +64,8 @@ void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFil
 				drcInflection << turnoverArr[i] << ",";	
 			drcInflection << turnoverArr[(i_bamFiles - 1)] << ")\n";
 
-			drcInflection << drcR(i_loopNumber, std::string(""), b_L4flag);
+			if (b_poissonFlagCall == true) { drcInflection << drcRpoisson(i_loopNumber, std::string("")); }
+			else { drcInflection << drcR(i_loopNumber, std::string(""), b_L4flag); }
 
 		} else if ( ((b_typeArr == b_peak1Arr) || (b_typeArr == b_peak2Arr)) && (b_model == true) ) {	//peak1 or peak2
 
@@ -87,7 +89,8 @@ void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFil
 				drcInflection << turnoverArr[i] << ",";	
 			drcInflection << turnoverArr[i_forwardEnd] << ")\n";
 
-			drcInflection << drcR(i_loopNumber, std::string("1"), b_L4flag);
+			if (b_poissonFlagCall == true) { drcInflection << drcRpoisson(i_loopNumber, std::string("1")); }
+			else { drcInflection << drcR(i_loopNumber, std::string("1"), b_L4flag); }
 
 			// reverse		
 			int i_reverseStart = i_maxIndex;
@@ -109,7 +112,8 @@ void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFil
 				drcInflection << turnoverArr[i] << ",";	
 			drcInflection << turnoverArr[i_bamFiles-1] << ")\n";
 
-			drcInflection << drcR(i_loopNumber, std::string("2"), b_L4flag);
+			if (b_poissonFlagCall == true) { drcInflection << drcRpoisson(i_loopNumber, std::string("2")); }
+			else { drcInflection << drcR(i_loopNumber, std::string("2"), b_L4flag); }
 
 
 		} else if ( ((b_typeArr == b_dip1Arr) || (b_typeArr == b_dip2Arr)) && (b_model == true) ) { 	//dip1 or dip2
@@ -134,7 +138,8 @@ void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFil
 				drcInflection << turnoverArr[i] << ",";	
 			drcInflection << turnoverArr[i_reverseEnd] << ")\n";
 
-			drcInflection << drcR(i_loopNumber, std::string("1"), b_L4flag);
+			if (b_poissonFlagCall == true) { drcInflection << drcRpoisson(i_loopNumber, std::string("1")); }
+			else { drcInflection << drcR(i_loopNumber, std::string("1"), b_L4flag); }
 
 			// forward		
 			int i_forwardStart = i_minIndex;
@@ -156,7 +161,8 @@ void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFil
 				drcInflection << turnoverArr[i] << ",";	
 			drcInflection << turnoverArr[i_bamFiles-1] << ")\n";
 
-			drcInflection << drcR(i_loopNumber, std::string("2"), b_L4flag);
+			if (b_poissonFlagCall == true) { drcInflection << drcRpoisson(i_loopNumber, std::string("2")); }
+			else { drcInflection << drcR(i_loopNumber, std::string("2"), b_L4flag); }
 
 		} else {											//undefined - model anyway
 			// time table
@@ -171,7 +177,8 @@ void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFil
 				drcInflection << turnoverArr[i] << ",";	
 			drcInflection << turnoverArr[(i_bamFiles - 1)] << ")\n";
 
-			drcInflection << drcR(i_loopNumber, std::string(""), b_L4flag);
+			if (b_poissonFlagCall == true) { drcInflection << drcRpoisson(i_loopNumber, std::string("")); }
+			else { drcInflection << drcR(i_loopNumber, std::string(""), b_L4flag); }
 		}
 	}
 

@@ -30,33 +30,54 @@ void rResiduals(std::string s_rPltsName, int i_peakNumber, std::vector<std::vect
 
 	for (int j = 1; j < i_peakNumber; j++) { 
 		std::string s_type = dataArray[j][2*i_bamFiles + 4]; // locus type
-		std::string s_riseRes =  dataArray[j][2*i_bamFiles + 11] + '\n';
-		std::string s_fallRes =  dataArray[j][2*i_bamFiles + 18] + '\n';
-		if (s_type == "rise") {  csvID << s_type << '\n'; csvRes << s_riseRes;}
-		if (s_type == "fall") {  csvID << s_type << '\n'; csvRes << s_fallRes;}
+		std::string s_riseRes =  dataArray[j][2*i_bamFiles + 11];
+		std::string s_fallRes =  dataArray[j][2*i_bamFiles + 18];
 		if (s_type == "undefined") {  
 			if (s_riseRes == "-") { // undefined fall
-				csvID << "undefined fall\n"; csvRes << s_fallRes;
+				csvID << "undefined fall\n"; 
+				if (s_fallRes == "-") { csvRes << "Nan" << '\n'; }
+				else { csvRes << s_fallRes << '\n'; }
 			} else { // undefined rise
-				csvID << "undefined rise\n"; csvRes << s_riseRes;
+				csvID << "undefined rise\n"; 
+				if (s_riseRes == "-") { csvRes << "Nan" << '\n'; }
+				else { csvRes << s_riseRes << '\n'; }
 			}
 		}
-		if (s_type == "hill") { csvID << "hill incline\nhill decline\n"; csvRes << s_riseRes << s_fallRes; }
-		if (s_type == "valley") { csvID << "valley decline\nvalley incline\n"; csvRes << s_fallRes << s_riseRes; }
+
+		if (s_riseRes == "-") { s_riseRes = "Nan"; } // eliminate '-'
+		if (s_fallRes == "-") { s_fallRes = "Nan"; } // eliminate '-'
+
+		if (s_type == "rise") { csvID << s_type << '\n'; csvRes << s_riseRes << '\n'; }
+		if (s_type == "fall") {  csvID << s_type << '\n'; csvRes << s_fallRes << '\n';}
+		if (s_type == "hill") { csvID << "hill incline\nhill decline\n"; csvRes << s_riseRes << '\n' << s_fallRes << '\n'; }
+		if (s_type == "valley") { csvID << "valley decline\nvalley incline\n"; csvRes << s_fallRes << '\n' << s_riseRes << '\n'; }
 	}
 
+	// last peak
 	std::string s_type = dataArray[i_peakNumber][2*i_bamFiles + 4]; // locus type
-	if (s_type == "rise") {  csvID << s_type; csvRes << dataArray[i_peakNumber][2*i_bamFiles + 11];}
-	if (s_type == "fall") {  csvID << s_type; csvRes << dataArray[i_peakNumber][2*i_bamFiles + 18];}
+	std::string s_riseRes =  dataArray[i_peakNumber][2*i_bamFiles + 11];
+	std::string s_fallRes =  dataArray[i_peakNumber][2*i_bamFiles + 18];
 	if (s_type == "undefined") {  
-		if (dataArray[i_peakNumber][2*i_bamFiles + 11] == "-") { // undefined fall
-			csvID << "undefined fall"; csvRes << dataArray[i_peakNumber][2*i_bamFiles + 18];
+		if (s_riseRes == "-") { // undefined fall
+			csvID << "undefined fall"; 
+			if (s_fallRes == "-") { csvRes << "Nan"; }
+			else { csvRes << s_fallRes; }
 		} else { // undefined rise
-			csvID << "undefined rise"; csvRes << dataArray[i_peakNumber][2*i_bamFiles + 11];
+			csvID << "undefined rise"; 
+			if (s_riseRes == "-") { csvRes << "Nan"; }
+			else { csvRes << s_riseRes; }
 		}
 	}
-	if (s_type == "hill") { csvID << "hill incline\nhill decline"; csvRes << dataArray[i_peakNumber][2*i_bamFiles + 11] << "\n" << dataArray[i_peakNumber][2*i_bamFiles + 18]; }
-	if (s_type == "valley") { csvID << "valley decline\nvalley incline"; csvRes << dataArray[i_peakNumber][2*i_bamFiles + 18] << "\n" << dataArray[i_peakNumber][2*i_bamFiles + 11]; }
+
+	if (s_riseRes == "-") { s_riseRes = "Nan"; } // eliminate '-'
+	if (s_fallRes == "-") { s_fallRes = "Nan"; } // eliminate '-'
+
+	if (s_type == "rise") {  csvID << s_type; csvRes << s_riseRes;}
+	if (s_type == "fall") {  csvID << s_type; csvRes << s_fallRes;}
+	if (s_type == "hill") { csvID << "hill incline\nhill decline"; csvRes << s_riseRes << "\n" << s_fallRes; }
+	if (s_type == "valley") { csvID << "valley decline\nvalley incline"; csvRes << s_fallRes << "\n" << s_riseRes; }
+
+
 
 	
 	rResBoxPlt << "dfResBox<- data.frame(idRes,ResBox)\n"; 

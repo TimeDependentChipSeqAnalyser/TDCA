@@ -22,10 +22,11 @@ int welcome()
 	std::cout << "    -t 			Time point threshold consideration for data modelling (allowable range from 0-2). Default = 1." << std::endl;
 	std::cout << "    -name	 	User specified name for output files." << std::endl;
 	std::cout << "    -model	 	Data modelled based on prediction. Default is no data modelling." << std::endl;
-	std::cout << "    -L5	 		Data modelled to 5 parameter logistic curve (asymmetry factor applies)." << std::endl;
+	std::cout << "    -L5	 		Data modelled to 5 parameter sigmoidal curve (asymmetry factor applies)." << std::endl;
+	std::cout << "    -poisson	 	Data modelled to 3 parameter sigmoidal curve assuming Poisson distributed coverage." << std::endl;
 	std::cout << "    -dm	 		Data matrix used to normalize user defined input files." << std::endl;
-	std::cout << "    -nonorm	 	Read depth will not be normalized based on sequencing depth of non-peak loci" << std::endl;
-	std::cout << "    -prenorm	 	User must input a pre-normalized data matrix of sequencing depth as specified in manual." << std::endl;
+	std::cout << "    -nonorm	 	Read coverage will not be normalized based on sequencing coverage of non-peak loci." << std::endl;
+	std::cout << "    -prenorm	 	User must input a pre-normalized data matrix of sequencing coverage as specified in manual." << std::endl;
 	std::cout << "    -proc	 	Explicitly state number of processors to use." << std::endl;
 	std::cout << "    -lin	 	Perform linear regression." << std::endl;
 	return 0;

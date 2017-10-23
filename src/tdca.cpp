@@ -54,12 +54,13 @@ void rStdev(std::string s_rPltsName, int i_bamFiles, int i_peakNumber, std::vect
 void rScat(std::string s_rPltsName, int i_bamFiles, int turnoverTimes[], int i_peakNumber, std::vector<std::vector<std::string> > &dataArray, int i_undefRise, int i_undefFall, int i_valley, int i_hill, int i_fall, int i_rise, bool b_model, std::string s_direction);
 void inflectionWriterReverse(std::vector<std::string> &drcInflectionVector, std::vector<std::string> &drcResidualsVector, std::vector<std::string> &linResVector);
 std::string exec(const char* cmd);
-void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFiles, int turnoverTimes[], std::vector<double> &turnoverArr, std::vector<bool> &b_typeArr, int i_minIndex, int i_maxIndex, double d_satthresh, std::vector<bool> &b_forwardArr, std::vector<bool> &b_reverseArr, std::vector<bool> &b_peak1Arr, std::vector<bool> &b_peak2Arr, std::vector<bool> &b_dip1Arr, std::vector<bool> &b_dip2Arr, bool b_model, bool b_L4flag, std::string s_name);
+void drcVersitile(int i_drcPar, int i_maxThreads, int i_loopNumber, int i_bamFiles, int turnoverTimes[], std::vector<double> &turnoverArr, std::vector<bool> &b_typeArr, int i_minIndex, int i_maxIndex, double d_satthresh, std::vector<bool> &b_forwardArr, std::vector<bool> &b_reverseArr, std::vector<bool> &b_peak1Arr, std::vector<bool> &b_peak2Arr, std::vector<bool> &b_dip1Arr, std::vector<bool> &b_dip2Arr, bool b_model, bool b_L4flag, std::string s_name, bool b_poissonFlagCall);
 void inflectionWriterVersitile(int i_maxThreads, int i_peakNumber, std::vector<std::string> &s_drcFI_vec, std::vector<std::string> &s_drcFH_vec, std::vector<std::string> &s_drcFU_vec, std::vector<std::string> &s_drcFL_vec, std::vector<std::string> &s_drcFE_vec, std::vector<std::string> &s_drcRI_vec, std::vector<std::string> &s_drcRH_vec, std::vector<std::string> &s_drcRU_vec, std::vector<std::string> &s_drcRL_vec, std::vector<std::string> &s_drcRE_vec, std::vector<std::string> &s_type_vec, std::vector<std::string> &s_drcRiseRes_vec, std::vector<std::string> &s_drcFallRes_vec, std::string s_name, std::vector<std::vector<std::string> > &transferArray);
 void rUpperA(std::string s_rPltsName, int i_peakNumber, int i_bamFiles, std::vector<std::vector<std::string> > &dataArray, int i_valley, int i_hill);
 void rProfiles(std::string s_rPltsName, int i_peakNumber, int i_bamFiles, std::vector<std::vector<std::string> > &dataArray, bool b_model, double d_satthresh, int turnoverTimes[], int i_valley, int i_hill, int i_fall, int i_rise, int i_undefRise, int i_undefFall);
 void rIdeosacCer3(std::string s_rPltsName, int i_bamFiles, int i_peakNumber, std::vector<std::vector<std::string> > &dataArray, std::string s_direction);
 std::string drcR(int i_loopNumber, std::string s_peakExtention, bool b_L4flag);
+std::string drcRpoisson(int i_loopNumber, std::string s_peakExtention);
 void pkgCheck();
 void rHeatmap(std::string s_rPltsName, int i_peakNumber, int i_bamFiles, std::vector<std::vector<std::string> > &dataArray, int turnoverTimes[]);
 void anime(int i_bamFiles, int i_validgenes, std::vector<double> &normGeneVector, int turnoverTimes[], std::string s_name, std::vector<std::string> &validGeneVector, std::string s_genelistFile);
@@ -180,6 +181,10 @@ int main(int argc, char* argv[])
 	std::string s_prenormFlag = "-prenorm";	//name flag
 	bool b_prenormFlagCall(false);		//true if prenorm flag called
 	std::string s_prenorm; 				//name of prenorm file
+
+	/** -poisson flag  **/
+	std::string s_poissonFlag = "-poisson";
+	bool b_poissonFlagCall = false;
 
 	std::string s_execPath = getExecPath();
 	std::cout << "Program path: " << s_execPath << std::endl;
@@ -334,6 +339,10 @@ int main(int argc, char* argv[])
 			s_dmFile = argv[i];
 		} else if (arg == s_normFlag) {
 			b_norm = false;
+		} else if (arg == s_poissonFlag) {
+			b_poissonFlagCall = true;
+			b_L4flag = false;
+			b_L5flag = false;
 		} else if (arg.find(s_pFlag) != std::string::npos) {
 			i++;
 			try {	
@@ -366,12 +375,14 @@ int main(int argc, char* argv[])
 			std::exit(0); }
 	} //for loop
 
+
+
 	// check if user specified information is logical
 	if (b_helpFlagCall) {
 		help();
 		std::exit(0); }
 	if (b_versionFlagCall) {
-		std::cout << "tdca 1.1.0_10-09-2017" <<  std::endl;
+		std::cout << "tdca 1.1.0_21-10-2017" <<  std::endl;
 		std::exit(0); }
 	if (b_bedFlagCall == false && b_prenormFlagCall == false) {
 		std::cout << "Coordinates of loci to be modelled must be specified with one of -bed or -prenorm. Program terminated." <<  std::endl;
@@ -412,7 +423,12 @@ int main(int argc, char* argv[])
 	if (b_satFlagCall == true && b_model == false) {
 		std::cout << "Saturation does not apply to data that is not modelled (cannot run -s without -model). Program terminated." << std::endl;
 		std::exit(0); }
-
+	if (b_poissonFlagCall == true && b_L4flag == true) {
+		std::cout << "Poisson modelling cannot be combined with 4 parameter modelling. Do not specify -poisson and -L4. Program terminated." << std::endl;
+		std::exit(0); }
+	if (b_poissonFlagCall == true && b_L5flag == true) {
+		std::cout << "Poisson modelling cannot be combined with 5 parameter modelling. Do not specify -poisson and -L5. Program terminated." << std::endl;
+		std::exit(0); }
 
 
 	if (b_prenormFlagCall == false) { // skip if --prenorm called
@@ -662,6 +678,7 @@ int main(int argc, char* argv[])
 		std::cout << "Five parameter sigmoidal curve fitting specified. TDCA will model data with an asymmetry factor." << std::endl; 
 		std::cout << "**WARNING** Interpretation of the asymmetry factor (f) is up to the user to experimentally validate." << std::endl;
 	}
+	if (b_poissonFlagCall) { std::cout << "-poisson flag called. TDCA will assume data is Poisson distributed and will model data to a three parameter sigmoidal curve." << std::endl; }
 	if (b_linFlag) {
 		std::cout << "-lin flag called. Linear regression will also be performed on each locus." << std::endl; }
 
@@ -1188,7 +1205,7 @@ BELOW HERE CHANGES SHOULD BE MADE FOR NEW TDCA
 		if (i_bamRep > 500) { // THIS CALCULATES INFLECTION POINT OF REPLICATES SEPERATELY THEN AVERAGES.
 			//drcNormScriptGeneratorString(i_loopCounter, i_bamFiles, i_truncDiff, turnoverTimes, normReadsVector, ($objName).b_realPeak, i_minIndex, i_bamRep, i_peakNumber);					
 		} else {											
-			drcVersitile(i_drcPar, i_maxThreads, i_loopCounter, i_bamFiles, turnoverTimes, ($objName).turnoverArr, ($objName).b_typeArr, i_minIndex, i_maxIndex, d_satthresh, b_forwardArr, b_reverseArr, b_peak1Arr, b_peak2Arr, b_dip1Arr, b_dip2Arr, b_model, b_L4flag, s_name);
+			drcVersitile(i_drcPar, i_maxThreads, i_loopCounter, i_bamFiles, turnoverTimes, ($objName).turnoverArr, ($objName).b_typeArr, i_minIndex, i_maxIndex, d_satthresh, b_forwardArr, b_reverseArr, b_peak1Arr, b_peak2Arr, b_dip1Arr, b_dip2Arr, b_model, b_L4flag, s_name, b_poissonFlagCall);
 		}												
 
 		// Progress
@@ -1277,7 +1294,7 @@ BELOW HERE CHANGES SHOULD BE MADE FOR NEW TDCA
 	}
 
 	// USE F VALUE TO ADJUST INFLECTION POINT - REPORT HALF MAXIMAL AS TTI
-	if (!b_L4flag) {
+	if ( (!b_L4flag) && (!b_poissonFlagCall) ) {
 		for (int i = 0; i < i_peakNumber; i++) {
 			if (b_model) {
 				if (s_type_vec[i] == "rise") { 

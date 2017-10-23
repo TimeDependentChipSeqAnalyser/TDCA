@@ -22,10 +22,11 @@ int help()
 	std::cout << "    -t 			Time point threshold consideration for data modelling (allowable range from 0-2). Default = 1." << std::endl;
 	std::cout << "    -name	 	User specified name for output files." << std::endl;
 	std::cout << "    -model	 	Data modelled based on prediction. Default is no data modelling." << std::endl;
-	std::cout << "    -L5	 		Data modelled to 5 parameter logistic curve (asymmetry factor applies)." << std::endl;
+	std::cout << "    -L5	 		Data modelled to 5 parameter sigmoidal curve (asymmetry factor applies)." << std::endl;
+	std::cout << "    -poisson	 	Data modelled to 3 parameter sigmoidal curve assuming Poisson distributed coverage." << std::endl;
 	std::cout << "    -dm	 		Data matrix used to normalize user defined input files." << std::endl;
-	std::cout << "    -nonorm	 	Read depth will not be normalized based on sequencing depth of non-peak loci" << std::endl;
-	std::cout << "    -prenorm	 	User must input a pre-normalized data matrix of sequencing depth as specified in manual." << std::endl;
+	std::cout << "    -nonorm	 	Read coverage will not be normalized based on sequencing coverage of non-peak loci." << std::endl;
+	std::cout << "    -prenorm	 	User must input a pre-normalized data matrix of sequencing coverage as specified in manual." << std::endl;
 	std::cout << "    -proc	 	Explicitly state number of processors to use." << std::endl;
 	std::cout << "    -lin	 	Perform linear regression." << std::endl;
 
@@ -68,13 +69,13 @@ int help()
 	std::cout << "		valleys, or falls. If not set, loci are modeled as a rise or fall only (single 5 parameter sigmoid).\n" << std::endl;
 	std::cout << "    Depth matrix flag: -dm <text_file> "  << std::endl;
 	std::cout << "		Data matrix used to normalize user defined input files. This file must contain integers equal to the number" << std::endl;
-	std::cout << "		of total bam files. The reported integers are then applied as total depth values for each bam file in order" << std::endl;
+	std::cout << "		of total bam files. The reported integers are then applied as total coverage values for each bam file in order" << std::endl;
 	std::cout << "		of replicate and then in chronological order.\n" << std::endl;
 	std::cout << "    No normalization flag: -nonorm "  << std::endl;
-	std::cout << "		Depth values at each locus will be modelled as is. Normalization based on the sequencing depth of non-peak " << std::endl;
+	std::cout << "		Coverage values at each locus will be modelled as is. Normalization based on the sequencing coverage of non-peak " << std::endl;
 	std::cout << "		loci will not be performed.\n" << std::endl;
 	std::cout << "    Pre-normalized data flag: -prenorm <text_file> "  << std::endl;
-	std::cout << "		A text file of loci with additional columns specifying time in tab delimited format. Sequencing depth data will " << std::endl;
+	std::cout << "		A text file of loci with additional columns specifying time in tab delimited format. Sequencing coverage data will " << std::endl;
 	std::cout << "		be modelled as is.\n" << std::endl;
 	std::cout << "    Linear regression flag: -lin"  << std::endl;
 	std::cout << "		TDCA will perform linear regression at each locus using all time points and will output relevant parameters." << std::endl;
